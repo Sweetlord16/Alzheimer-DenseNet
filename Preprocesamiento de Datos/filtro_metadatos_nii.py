@@ -1,11 +1,12 @@
 import os
 import shutil
 
+#@author Eric Cabrera Cruz
 # Directorio raíz original y destino
 origen = r"D:\data\los q faltan\ADNI"
 destino = r"D:\data\directorio_filtrado\ADNI"
 
-# Lista de descripciones válidas, usando formato de nombre de directorio (con '__')
+# Lista del valor de Description válidas
 descripciones_validas = {
     "MPR__GradWarp__B1_Correction__N3__Scaled",
     "MPR__GradWarp__N3__Scaled",
@@ -33,7 +34,7 @@ for sujeto in os.listdir(origen):
             continue
 
         if descripcion in descripciones_validas:
-            # Construir el path de destino
+            # Consturimos el path de destino
             destino_path = os.path.join(destino, sujeto, descripcion)
             if not os.path.exists(destino_path):
                 shutil.copytree(path_descripcion, destino_path)

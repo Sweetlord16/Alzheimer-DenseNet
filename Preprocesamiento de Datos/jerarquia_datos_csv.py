@@ -6,9 +6,20 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from datetime import datetime
 
+#@author Eric Cabrera Cruz
 
-#Recordatorio eric ---> Ya revisado
 def process_from_csv(csv_path):
+
+    """
+    Procesa un archivo CSV con metadatos asociados a una imagen MRI, extrae los más importantes y llama a la función para procesar cada imagen.
+
+    Args:
+        csv_path (str): Ruta del archivo CSV con los metadatos.
+
+    Returns:
+        None
+    """
+
     df = pd.read_csv(csv_path)
 
     for _, row in df.iterrows():
@@ -26,7 +37,17 @@ def process_from_csv(csv_path):
 
 
 def load_neuro_image(path):
-    """ Carga una imagen de resonancia magnética en formato .nii """
+
+    """
+    Carga una imagen MRI en formato .nii.
+
+    Args:
+        path (str): Ruta al archivo de imagen .nii.
+
+    Returns:
+        nibabel.Nifti1Image or None: Objeto imagen cargado si existe y se puede abrir, sino None.
+    """
+
     if not os.path.exists(path):
         print(f"Error: No existe el archivo {path}")
         return None
@@ -38,6 +59,26 @@ def load_neuro_image(path):
 
 def show_and_save_image(neuro_image_data, output_dir, subject_identifier, image_uid, visit_identifier, category, plane, index):
     
+    """
+        Muestra un corte específico de la imagen MRI y la guarda como archivo JPG.
+
+        Args:
+            neuro_image_data (numpy.ndarray): Matriz 3D con los datos de la imagen.
+            output_dir (str): Directorio base para guardar las imágenes.
+            subject_identifier (str): Identificador del sujeto.
+            image_uid (str): Identificador único de la imagen.
+            visit_identifier (str): Identificador de la visita.
+            category (str): Categoría del sujeto (MCI, CN, AD).
+            plane (str): Plano del corte ('Axial', 'Coronal' o 'Sagittal').
+            index (int): Índice del corte en el plano seleccionado.
+
+        Raises:
+            ValueError: Si el plano no es válido.
+
+        Returns:
+            str: Ruta del archivo JPG guardado.
+    """
+
     visit_dir = os.path.join(output_dir, visit_identifier)
     os.makedirs(visit_dir, exist_ok=True)
 
@@ -45,7 +86,7 @@ def show_and_save_image(neuro_image_data, output_dir, subject_identifier, image_
     os.makedirs(plane_dir, exist_ok=True)
     category_dir = os.path.join(plane_dir, category)
     os.makedirs(category_dir, exist_ok=True)
-    #Lo de las visits va por aqui
+    
     
     
     if plane == 'Axial':
@@ -70,6 +111,23 @@ def show_and_save_image(neuro_image_data, output_dir, subject_identifier, image_
 
 
 def process_neuro_images(subject_identifier, visit_identifier, image_uid, date_acquired, processed_data_label, research_group):
+
+    """
+    Busca y procesa las imágenes MRI de un sujeto en función de sus metadatos y guarda sus cortes en JPG.
+
+    Args:
+        subject_identifier (str): Identificador del sujeto.
+        visit_identifier (str): Identificador de la visita.
+        image_uid (str): Identificador único de la imagen.
+        date_acquired (str): Fecha de adquisición en formato 'YYYY-MM-DD'.
+        processed_data_label (str): Etiqueta que describe el procesamiento de la imagen.
+        research_group (str): Grupo de investigación o categoría del sujeto (MCI, CN, AD).
+
+    Returns:
+        None
+    """
+
+
     base_path = os.path.abspath( r"D:\data\Final Dataset\ADNI")
     subject_folder = os.path.join(base_path, subject_identifier)
 

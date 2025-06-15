@@ -2,9 +2,7 @@ import pandas as pd
 
 input_file = r"C:\Users\Eric\Desktop\Novus Initium\Ars Discendi\TFG\ROSTER_19Apr2025.csv"
 
-#rids = [
-#   4004, 4005, 4007, 4012, 4022, 4036, 4051, 4054, 4059, 4063, 4067, 4072, 4073, 4085, 4102, 4127, 4128, 4133, 4134, 4143, 4146, 4149, 4157, 4159, 4160, 4168, 4175, 4184, 4185, 4186, 4188, 4199, 4202, 4205, 4206, 4212, 4216, 4217, 4220, 4226, 4232, 4235, 4237, 4241, 4245, 4256, 4259, 4260, 4268, 4271, 4272, 4274, 4281, 4285, 4297, 4299, 4301, 4309, 4310, 4312, 4327, 4328, 4331, 4332, 4351, 4356, 4360, 4380, 4383, 4390, 4392, 4404, 4405, 4415, 4417, 4419, 4420, 4431, 4434, 4438, 4443, 4445, 4447, 4455, 4463, 4465, 4467, 4468, 4473, 4475, 4476, 4480, 4498, 4512, 4513, 4514, 4517, 4522, 4530, 4536, 4539, 4540, 4547, 4553, 4556, 4557, 4565, 4571, 4575, 4594, 4597, 4601, 4603, 4610, 4613, 4614, 4621, 4623, 4624, 4635, 4659, 4661, 4674, 4678, 4679, 4680, 4694, 4706, 4708, 4742, 4744, 4745, 4764, 4765, 4780, 4791, 4799, 4803, 4805, 4809, 4813, 4814, 4816, 4823, 4825, 4838, 4844, 4849, 4858, 4868, 4871, 4874, 4876, 4883, 4891, 4893, 4897, 4898, 4907, 4914, 4917, 4919, 4926, 4941, 4944, 4947, 4958, 4966, 4974, 4986, 4987, 5000, 5004, 5007, 5014, 5026, 5031, 5066, 5099, 5135, 5160, 4015, 4029, 4030, 4034, 4035, 4042, 4053, 4057, 4058, 4061, 4077, 4079, 4094, 4096, 4114, 4115, 4122, 4131, 4138, 4162, 4167, 4169, 4170, 4171, 4187, 4189, 4194, 4197, 4203, 4210, 4214, 4219, 4229, 4240, 4243, 4244, 4250, 4251, 4263, 4287, 4293, 4294, 4300, 4302, 4303, 4311, 4324, 4346, 4354, 4359, 4363, 4366, 4377, 4381, 4394, 4395, 4402, 4403, 4406, 4408, 4414, 4423, 4426, 4430, 4432, 4444, 4456, 4458, 4462, 4489, 4502, 4507, 4510, 4515, 4521, 4524, 4531, 4538, 4542, 4543, 4548, 4562, 4564, 4582, 4584, 4590, 4595, 4596, 4605, 4611, 4622, 4626, 4629, 4630, 4631, 4633, 4636, 4646, 4653, 4654, 4668, 4671, 4675, 4689, 4711, 4712, 4713, 4714, 4715, 4720, 4721, 4722, 4723, 4729, 4736, 4741, 4743, 4746, 4750, 4757, 4767, 4769, 4777, 4782, 4784, 4793, 4796, 4798, 4804, 4806, 4807, 4815, 4817, 4842, 4852, 4857, 4862, 4869, 4873, 4877, 4885, 4888, 4889, 4896, 4899, 4902, 4903, 4904, 4909, 4918, 4920, 4922, 4925, 4928, 4929, 4936, 4943, 4945, 4955, 4960, 4976, 4985, 4989, 5047, 4001, 4009, 4024, 4039, 4089, 4095, 4136, 4152, 4153, 4172, 4192, 4195, 4201, 4209, 4211, 4215, 4223, 4252, 4258, 4280, 4282, 4307, 4338, 4353, 4373, 4379, 4477, 4494, 4500, 4501, 4526, 4546, 4549, 4568, 4583, 4589, 4591, 4615, 4625, 4641, 4657, 4660, 4672, 4676, 4686, 4692, 4696, 4707, 4718, 4719, 4728, 4730, 4732, 4733, 4737, 4740, 4755, 4756, 4770, 4772, 4774, 4783, 4792, 4801, 4802, 4820, 4827, 4845, 4853, 4859, 4863, 4867, 4879, 4887, 4892, 4894, 4905, 4906, 4910, 4911, 4912, 4924, 4938, 4940, 4949, 4954, 4959, 4962, 4963, 4964, 4968, 4971, 4980, 4982, 4984, 4990, 4992, 4994, 4997, 5005, 5006, 5012, 5013, 5015, 5016, 5017, 5018, 5019, 5027, 5028, 5029, 5032, 5037, 5038, 5054, 5056, 5057, 5058, 5059, 5062, 5063, 5067, 5070, 5071, 5087, 5090, 5095, 5106, 5112, 5119, 5120, 5123, 5138, 5146, 5162, 5165, 5184, 5187, 5196, 5205, 5206, 5208, 5210, 5224, 5231, 5240, 5241, 5251, 5252, 5275
-#]
+#Lista de las RID de los 819 pacientes del estudio DigitalHealth
 
 rids = [
     2, 5, 8, 14, 15, 16, 19, 21, 22, 23, 31, 35, 40, 43, 47, 48, 55, 56, 58, 59, 61, 66, 67, 68, 69, 70, 72, 74, 81, 86,
@@ -48,18 +46,16 @@ rids = [
 
 print(len(rids))
 
-# Cargar el CSV
 df = pd.read_csv(input_file)
 
 filtered_df = df[(df["RID"].isin(rids)) & (df.iloc[:, 0] == "ADNI1")]
 
 filtered_df = filtered_df.drop_duplicates()
-# Guardar a un nuevo archivo
 filtered_df.to_csv(r"C:\Users\Eric\Desktop\Novus Initium\Ars Discendi\TFG\TFG_ADNI.csv", index=False)
 ptid_list = filtered_df["PTID"].tolist()
 ptid_text = ",".join(ptid_list)
 
-# Guardar el TXT
+# Guardamos en un TXT para visualizar los datos posteriormente
 with open(r"C:\Users\Eric\Desktop\Novus Initium\Ars Discendi\TFG\TFG_PTID.txt", "w") as f:
     f.write(ptid_text)
 
@@ -70,15 +66,15 @@ print("Archivo de PTIDs guardado como TFG_PTID.txt")
 
 print("Buscamos coincidencias")
 
-# 1. Cargar tus datos filtrados
+# Cargar tus datos filtrados
 filtered_csv= pd.read_csv(r"C:\Users\Eric\Desktop\Novus Initium\Ars Discendi\TFG\TFG_ADNI.csv")
 
-# 2. Cargar el segundo archivo
+# Cargar el segundo archivo
 adni1_df = pd.read_csv(r"C:\Users\Eric\Desktop\Novus Initium\Ars Discendi\TFG\ADNI1_Complete_1Yr_1.5T_4_26_2025.csv")
 
 adni1_sc_df = adni1_df[adni1_df["Visit"] == "sc"]
 
-# 4. Extraer las listas de PTID
+# Extraemos las listas de PTID
 filtered_ptids = set(filtered_df["PTID"])
 print("PTID MIOS")
 
@@ -87,23 +83,22 @@ adni1_ptids = set(adni1_sc_df["Subject"])
 print(len(adni1_ptids))
 
 
-# 4. Encontrar coincidencias
+# Buscamos las  coincidencias
 coincidencias = filtered_ptids.intersection(adni1_ptids)
 
-# 5. Mostrar cuántas coincidencias hay
 print(f"Número de PTIDs coincidentes: {len(coincidencias)}")
 
 
-# 6. Buscar los PTID que no están en el archivo ADNI1
+# Buscamos los PTID que no están en el archivo ADNI1
 adni1_ptid_list = adni1_sc_df["Subject"].tolist()
 
-# 7. Comparar los PTID de tus datos filtrados con los de ADNI1
+# Comparamos los PTID de tus datos filtrados con los de ADNI1
 non_matching_ptids = [ptid for ptid in ptid_list if ptid not in adni1_ptid_list]
 
 print(f"Número de PTIDs NO coincidentes: {len(non_matching_ptids)}")
 
 
-# 8. Guardar los PTID no coincidentes en un archivo de texto
+# Guardamos los PTID no coincidentes en un archivo de texto
 non_matching_text = ",".join(map(str, non_matching_ptids))
 
 with open(r"C:\Users\Eric\Desktop\Novus Initium\Ars Discendi\TFG\Non_Matching_PTID.txt", "w") as f:

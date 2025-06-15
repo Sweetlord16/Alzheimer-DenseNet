@@ -1,12 +1,12 @@
 import pandas as pd
 
-# Nombre del archivo original
+#@author Eric Cabrera Cruz
+# Nombre del archivo original de metadatos ADNI con todos los formatos
 input_file = r"C:\Users\Eric\Desktop\Novus Initium\Ars Discendi\TFG\Csvs Metadata\Sin filtro\m06,sc,m12_4_29_2025.csv"
 
-# Leer el CSV
 df = pd.read_csv(input_file)
 
-# Lista de valores permitidos en la columna 'Description'
+# Lista de valores permitidos en la columna 'Description' asociados al formato NiFTI
 valores_validos = [
     "MPR; GradWarp; B1 Correction; N3; Scaled",
     "MPR; GradWarp; B1 Correction",
@@ -19,13 +19,12 @@ valores_validos = [
     "MPR-R; GradWarp; B1 Correction; N3; Scaled",
 ]
 
-# Filtrar las filas que tienen alguno de esos valores en 'Description'
 filtered_df = df[df['Description'].isin(valores_validos)]
 
 
 
 
-# Guardar el resultado en un nuevo CSV
+# Guardamos el resultado en un nuevo CSV
 output_file = r"C:\Users\Eric\Desktop\Novus Initium\Ars Discendi\TFG\Csvs Metadata\Con filtro\subjects_left_m06_sc_m12_filtered_output.csv"
 filtered_df.to_csv(output_file, index=False)
 
