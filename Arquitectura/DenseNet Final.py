@@ -48,25 +48,6 @@ class CustomDataset(Dataset):
         return image, self.labels[idx]
 
 
-class EarlyStopper:
-    def __init__(self, patience, min_delta):
-        self.patience = patience
-        self.min_delta = min_delta
-        self.counter = 0
-        self.min_validation_loss = float('inf')
-
-    def early_stop(self, validation_loss):
-        if validation_loss < self.min_validation_loss:
-            self.min_validation_loss = validation_loss
-            self.counter = 0
-        elif validation_loss > (self.min_validation_loss + self.min_delta):
-            self.counter += 1
-            if self.counter >= self.patience:
-                return True
-        return False
-
-
-
 class DenseNetModel:
     def __init__(self, data_dir, num_classes=3, batch_size=62, num_epochs=200, learning_rate=0.000001, train_paths = "", train_labels = "", test_paths = "", test_labels = ""):
 
@@ -134,7 +115,6 @@ class DenseNetModel:
 
 
     def train(self, train_loader, val_loader, num_epochs):
-        #early_stopper = EarlyStopper(patience=3, min_delta=0.0001)
         print (f"...Comenzando entrenamiento función train...")
         for epoch in range(num_epochs):
             self.model.train()
@@ -186,9 +166,6 @@ class DenseNetModel:
                   f"Precisión (Validación): {val_accuracy:.2f}%, "
                   f"Pérdida de Validación: {val_loss:.4f}")
 
-            #if early_stopper.early_stop(val_loss):
-            #    print(f"Early stopping en la época {epoch+1}")
-            #    break
 
         print("Entrenamiento finalizado.")
 
