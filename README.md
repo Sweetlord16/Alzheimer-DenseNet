@@ -1,7 +1,3 @@
-# Alzheimer-DenseNet
-Enlace a los resultados (formato .zip):  
-[https://drive.google.com/file/d/1EQY8m0IlAoK3vRxVg-8ZmWjgwpIaP3I7/view?usp=sharing](https://drive.google.com/file/d/1EQY8m0IlAoK3vRxVg-8ZmWjgwpIaP3I7/view?usp=sharing)
-
 #  Manual de Usuario
 
 Este repositorio contiene el código necesario para llevar a cabo simulaciones de trabajo realizado en este TFG, utilizando la arquitectura de redes convolucionales 2D DenseNet. El proceso incluye tanto el **preprocesamiento del conjunto de datos para la entrada del sistema** como la **ejecución de los distintos modelos de clasificación**.
