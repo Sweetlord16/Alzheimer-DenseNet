@@ -124,6 +124,6 @@ Se recomienda usar un entorno virtual, en nuestro caso se hizo uso del entorno C
 
 ##  Resultados
 
-Durante la ejecución se imprimen métricas por fold. Las gráficas pueden descargarse en el drive adjunto
+Durante la ejecución se imprimen métricas por fold y el promedio de todas ellas.
 
 ---
