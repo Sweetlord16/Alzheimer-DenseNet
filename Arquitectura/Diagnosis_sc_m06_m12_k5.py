@@ -24,15 +24,18 @@ from sklearn.model_selection import StratifiedKFold
 
 from torchvision.models import DenseNet
 
-
-
-# ------------------------- Custom Dataset -------------------------
-
-# https://docs.pytorch.org/vision/main/datasets.html
-# "All datasets are subclasses of torch.utils.data.Dataset i.e, they have __getitem__ and __len__ methods implemented.
-# Hence, they can all be passed to a torch.utils.data.DataLoader which can load multiple samples in parallel usin"
-
 class CustomDataset(Dataset):
+    """
+    Define un dataset personalizado para cargar imágenes y sus etiquetas, compatible con DataLoader de PyTorch.
+
+    Args:
+        image_paths (list): Lista de rutas de las imágenes.
+        labels (list): Lista de etiquetas correspondientes a cada imagen.
+        transform (callable, opcional): Transformaciones que se aplicarán a las imágenes (por ejemplo, redimensionado, normalización, etc.).
+
+    Returns:
+        tuple: Imagen transformada y su etiqueta asociada.
+    """
     def __init__(self, image_paths, labels, transform=None):
         self.image_paths = image_paths
         self.labels = labels
@@ -51,6 +54,26 @@ class CustomDataset(Dataset):
 
 
 class DenseNetModel:
+    """
+    Implementa un modelo de clasificación de imágenes basado en DenseNet121 utilizando PyTorch.
+
+    Esta clase prepara los datos, define la arquitectura del modelo, establece el proceso de entrenamiento y validación,
+    y proporciona utilidades para guardar el modelo, generar matrices de confusión, gráficas de métricas de entrenamiento y curvas ROC, tanto en configuraciones multiclase como binarias.
+
+    Args:
+        data_dir (str): Ruta del directorio con los datos de las imágenes.
+        num_classes (int): Número de clases a predecir. Por defecto es 3.
+        batch_size (int): Tamaño del batch para entrenamiento y validación. Por defecto es 62.
+        num_epochs (int): Cantidad de épocas de entrenamiento. Por defecto es 200.
+        learning_rate (float): Tasa de aprendizaje para el optimizador. Por defecto es 0.000001.
+        train_paths (list): Lista de rutas de las imágenes de entrenamiento.
+        train_labels (list): Lista de etiquetas correspondientes a las imágenes de entrenamiento.
+        test_paths (list): Lista de rutas de las imágenes de prueba.
+        test_labels (list): Lista de etiquetas correspondientes a las imágenes de prueba.
+
+    Returns:
+        None
+    """
     def __init__(self, data_dir, num_classes=3, batch_size=62, num_epochs=200, learning_rate=0.000001, train_paths = "", train_labels = "", test_paths = "", test_labels = ""):
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -184,7 +207,7 @@ class DenseNetModel:
         all_labels = []
 
         with torch.no_grad():
-            for images, labels in self.val_loader:
+            for images, labels in self.test_loader:
                 images, labels = images.to(self.device), labels.to(self.device)
                 outputs = self.model(images)
                 _, preds = torch.max(outputs, 1)
@@ -251,8 +274,6 @@ class DenseNetModel:
 
     #basado en https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html que me mando pablo
     #https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_curve.html
-
-    #Revisar por que me da que la pifie en algun lado
 
 
 
@@ -374,7 +395,7 @@ class DenseNetModel:
               mean_score = auc(fpr_grid, mean_tpr[ix])
               pair_scores.append(mean_score)
 
-              #esto es pa las medias
+              #esto es para las medias
               #------------------------------------------
 
               all_fprs.append(fpr_grid)
@@ -421,7 +442,7 @@ class DenseNetModel:
           print(f"\nMacro-averaged One-vs-One ROC AUC score:\n{np.average(pair_scores):.2f}")
           return all_fprs, all_tprs, all_aucs, pair_list
 
-#Dataset solo SC
+#Dataset sc,m06 y m12
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 trainin_paths = [r'C:\Users\comci\Desktop\TFG Eric\Datase_ordernado_visitas\m12\Axial', r'C:\Users\comci\Desktop\TFG Eric\Datase_ordernado_visitas\m12\Coronal', r'C:\Users\comci\Desktop\TFG Eric\Datase_ordernado_visitas\m12\Sagittal']
@@ -431,20 +452,9 @@ diagnosis_training_path_m06 = [r'C:\Users\comci\Desktop\TFG Eric\Datase_ordernad
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-
-
-
-#Por si se me olvida, el lr lo hardcodeamos a 10^-5 por que asi va volando el modelo.
-
 lr = 0.000055
 cont = 0  
-batch_size = 64  #Este fue el que dijimos de mirar en la reunion
-
-#==========================================================================================================
-#                                       MEJORES PARAMETROS
-#                                           K = 12
-#                                          BS = 64
-#==========================================================================================================
+batch_size = 64  
 
 def get_mean_confusion_matrix(all_confusion_matrices,class_names):
             mean_cm = np.mean(np.stack(all_confusion_matrices), axis=0)
@@ -544,9 +554,7 @@ def plot_mean_roc_curves_by_class(all_fpr_ad, all_fpr_cn, all_fpr_mci,
     plt.plot(mean_fpr, mean_tpr_cn, label=f"CN vs Rest (AUC = {mean_auc_cn:.2f})", color='blue', lw=2)
     plt.plot(mean_fpr, mean_tpr_mci, label=f"MCI vs Rest (AUC = {mean_auc_mci:.2f})", color='green', lw=2)
     
-    # --------------------------
     # Calcular curva promedio (macro-average) de las 3 curvas 1vsRest
-    # --------------------------
     mean_tpr_macro = (mean_tpr_ad + mean_tpr_cn + mean_tpr_mci) / 3
     mean_auc_macro = auc(mean_fpr, mean_tpr_macro)
 
@@ -613,14 +621,11 @@ def plot_mean_binary_roc_curve(mean_fpr_pairs, mean_tpr_pairs, mean_auc_pairs, p
     for i, (fpr, tpr, auc_value, pair) in enumerate(zip(mean_fpr_pairs, mean_tpr_pairs, mean_auc_pairs, pair_list)):
         label_a, label_b = pair
         plt.plot(fpr, tpr, label=f"{target_to_class[label_a]} vs {target_to_class[label_b]} (AUC = {auc_value:.2f})", lw=2)
-        #plt.fill_between(fpr, tpr - 0.05, tpr + 0.05, alpha=0.2)  # Para dar una visualización del intervalo de confianza
-
-        # Línea aleatoria (Random)
         plt.plot([0, 1], [0, 1], 'k--', label='Random')
 
-        # ------------------------------
+  
         # Calcular curva media global (macro-average)
-        # ------------------------------
+
         fpr_grid = np.linspace(0, 1, 100)
         mean_tpr_macro = np.zeros_like(fpr_grid)
 
@@ -674,13 +679,9 @@ for path, diag_path , diag_path_m06 in zip(trainin_paths, diagnosis_training_pat
         plano = os.path.basename(name)
 
         image_paths, labels, class_names = get_image_paths_and_labels(data_dir)
-        
-        #---------- Objetivo 3 -------------------------------------------------
-
         sc_paths, sc_labels, classes = get_image_paths_and_labels(diag_path)
         m06_paths, m06_labels, classes = get_image_paths_and_labels(diag_path_m06)
         
-        #-----------------------------------------------------------------------
         print(class_names)
         k_folds = 5
         kfold = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=0)
@@ -707,7 +708,7 @@ for path, diag_path , diag_path_m06 in zip(trainin_paths, diagnosis_training_pat
         all_auc_cn = []
         all_auc_mci = []
 
- #Para obtener la metrica de la media de los roc binatrias
+        #Para obtener la metrica de la media de los roc binatrias
 
         all_fpr_pairs = []
         all_tpr_pairs = []
@@ -724,12 +725,11 @@ for path, diag_path , diag_path_m06 in zip(trainin_paths, diagnosis_training_pat
             test_labels = [labels[i] for i in test_idx]
 
             
-            #---------- Objetivo 3 ---------------------------------------------
+            #aAregamos al conjunto de entrenamiento los datos de sc y m06
             
             train_paths += sc_paths + m06_paths
             train_labels += sc_labels + m06_labels
             
-            #-------------------------------------------------------------------
 
             densenet_model = DenseNetModel(data_dir=data_dir, num_classes=3, num_epochs=5,
                                         learning_rate=lr, batch_size=batch_size, train_paths = train_paths,
@@ -806,10 +806,3 @@ for path, diag_path , diag_path_m06 in zip(trainin_paths, diagnosis_training_pat
         plot_mean_binary_roc_curve(mean_fpr_pairs, mean_tpr_pairs, mean_auc_pairs, pair_list, plano, lr, batch_size)
 
         cont+=1
-
-
-#Una posible herramienta que usare mas tarde
-class MetricOperations:
-    def __init__(self):
-        pass
-

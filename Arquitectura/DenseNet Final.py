@@ -26,13 +26,22 @@ from torchvision.models import DenseNet
 
 
 
-# ------------------------- Custom Dataset -------------------------
 
-# https://docs.pytorch.org/vision/main/datasets.html
-# "All datasets are subclasses of torch.utils.data.Dataset i.e, they have __getitem__ and __len__ methods implemented.
-# Hence, they can all be passed to a torch.utils.data.DataLoader which can load multiple samples in parallel usin"
 
 class CustomDataset(Dataset):
+
+    """
+    Define un dataset personalizado para cargar imágenes y sus etiquetas, compatible con DataLoader de PyTorch.
+
+    Args:
+        image_paths (list): Lista de rutas de las imágenes.
+        labels (list): Lista de etiquetas correspondientes a cada imagen.
+        transform (callable, opcional): Transformaciones que se aplicarán a las imágenes (por ejemplo, redimensionado, normalización, etc.).
+
+    Returns:
+        tuple: Imagen transformada y su etiqueta asociada.
+    """
+
     def __init__(self, image_paths, labels, transform=None):
         self.image_paths = image_paths
         self.labels = labels
@@ -49,6 +58,26 @@ class CustomDataset(Dataset):
 
 
 class DenseNetModel:
+    """
+    Implementa un modelo de clasificación de imágenes basado en DenseNet121 utilizando PyTorch.
+
+    Esta clase prepara los datos, define la arquitectura del modelo, establece el proceso de entrenamiento y validación,
+    y proporciona utilidades para guardar el modelo, generar matrices de confusión, gráficas de métricas de entrenamiento y curvas ROC, tanto en configuraciones multiclase como binarias.
+
+    Args:
+        data_dir (str): Ruta del directorio con los datos de las imágenes.
+        num_classes (int): Número de clases a predecir. Por defecto es 3.
+        batch_size (int): Tamaño del batch para entrenamiento y validación. Por defecto es 62.
+        num_epochs (int): Cantidad de épocas de entrenamiento. Por defecto es 200.
+        learning_rate (float): Tasa de aprendizaje para el optimizador. Por defecto es 0.000001.
+        train_paths (list): Lista de rutas de las imágenes de entrenamiento.
+        train_labels (list): Lista de etiquetas correspondientes a las imágenes de entrenamiento.
+        test_paths (list): Lista de rutas de las imágenes de prueba.
+        test_labels (list): Lista de etiquetas correspondientes a las imágenes de prueba.
+
+    Returns:
+        None
+    """
     def __init__(self, data_dir, num_classes=3, batch_size=62, num_epochs=200, learning_rate=0.000001, train_paths = "", train_labels = "", test_paths = "", test_labels = ""):
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -179,7 +208,7 @@ class DenseNetModel:
         all_labels = []
 
         with torch.no_grad():
-            for images, labels in self.val_loader:
+            for images, labels in self.test_loader:
                 images, labels = images.to(self.device), labels.to(self.device)
                 outputs = self.model(images)
                 _, preds = torch.max(outputs, 1)
@@ -224,7 +253,7 @@ class DenseNetModel:
             plt.legend(loc='upper right')
 
             plt.savefig(f"Metric_{name}_loss_LR{lr}_BS{batch_size}_KFOLD_{fold}.png")
-            plt.savefig(f"Metric_{name}_loss_LR{lr}_BS{batch_size}_KFOLD_{fold}.svg")  #esta linea estaba mal --> corregida
+            plt.savefig(f"Metric_{name}_loss_LR{lr}_BS{batch_size}_KFOLD_{fold}.svg")  
 
             plt.clf()
 
@@ -244,10 +273,10 @@ class DenseNetModel:
 
             return np.concatenate(all_labels), np.concatenate(all_scores)
 
-    #basado en https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html que me mando pablo
+    #basado en https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc.html 
     #https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_curve.html
 
-    #Revisar por que me da que la pifie en algun lado
+ 
 
 
 
@@ -369,7 +398,7 @@ class DenseNetModel:
               mean_score = auc(fpr_grid, mean_tpr[ix])
               pair_scores.append(mean_score)
 
-              #esto es pa las medias
+              #esto es para las medias
               #------------------------------------------
 
               all_fprs.append(fpr_grid)
@@ -423,21 +452,10 @@ trainin_paths = [r'C:\Users\comci\Desktop\TFG Eric\Datase_ordernado_visitas\m12\
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-
-
-
-#Por si se me olvida, el lr lo hardcodeamos a 10^-5 por que asi va volando el modelo.
-
 lr = 0.000055
 cont = 0  
-batch_size = 64  #Este fue el que dijimos de mirar en la reunion
+batch_size = 64  
 
-#==========================================================================================================
-#                                       MEJORES PARAMETROS
-#                                           K = 12
-#                                          BS = 64
-#==========================================================================================================
 
 def get_mean_confusion_matrix(all_confusion_matrices,class_names):
             mean_cm = np.mean(np.stack(all_confusion_matrices), axis=0)
@@ -537,13 +555,10 @@ def plot_mean_roc_curves_by_class(all_fpr_ad, all_fpr_cn, all_fpr_mci,
     plt.plot(mean_fpr, mean_tpr_cn, label=f"CN vs Rest (AUC = {mean_auc_cn:.2f})", color='blue', lw=2)
     plt.plot(mean_fpr, mean_tpr_mci, label=f"MCI vs Rest (AUC = {mean_auc_mci:.2f})", color='green', lw=2)
     
-    # --------------------------
     # Calcular curva promedio (macro-average) de las 3 curvas 1vsRest
-    # --------------------------
     mean_tpr_macro = (mean_tpr_ad + mean_tpr_cn + mean_tpr_mci) / 3
     mean_auc_macro = auc(mean_fpr, mean_tpr_macro)
 
-    # Añadir curva promedio a la gráfica
     plt.plot(
         mean_fpr,
         mean_tpr_macro,
@@ -606,14 +621,10 @@ def plot_mean_binary_roc_curve(mean_fpr_pairs, mean_tpr_pairs, mean_auc_pairs, p
     for i, (fpr, tpr, auc_value, pair) in enumerate(zip(mean_fpr_pairs, mean_tpr_pairs, mean_auc_pairs, pair_list)):
         label_a, label_b = pair
         plt.plot(fpr, tpr, label=f"{target_to_class[label_a]} vs {target_to_class[label_b]} (AUC = {auc_value:.2f})", lw=2)
-        #plt.fill_between(fpr, tpr - 0.05, tpr + 0.05, alpha=0.2)  # Para dar una visualización del intervalo de confianza
 
-        # Línea aleatoria (Random)
         plt.plot([0, 1], [0, 1], 'k--', label='Random')
 
-        # ------------------------------
         # Calcular curva media global (macro-average)
-        # ------------------------------
         fpr_grid = np.linspace(0, 1, 100)
         mean_tpr_macro = np.zeros_like(fpr_grid)
 
@@ -643,7 +654,6 @@ def plot_mean_binary_roc_curve(mean_fpr_pairs, mean_tpr_pairs, mean_auc_pairs, p
         plt.grid()
         plt.tight_layout()
 
-        # Guardamos la gráfica
         plt.savefig(f"Mean_{plano}_{target_to_class[label_a]} vs {target_to_class[label_b]}_LR{lr}_BS{batch_size}_binary_ROC_curve.png")
         plt.savefig(f"Mean_{plano}_{target_to_class[label_a]} vs {target_to_class[label_b]}_LR{lr}_BS{batch_size}_binary_ROC_curve.svg")
 
@@ -691,7 +701,7 @@ for path in trainin_paths:
         all_auc_cn = []
         all_auc_mci = []
 
- #Para obtener la metrica de la media de los roc binatrias
+        #Para obtener la metrica de la media de los roc binatrias
 
         all_fpr_pairs = []
         all_tpr_pairs = []
@@ -782,10 +792,3 @@ for path in trainin_paths:
         plot_mean_binary_roc_curve(mean_fpr_pairs, mean_tpr_pairs, mean_auc_pairs, pair_list, plano, lr, batch_size)
 
         cont+=1
-
-
-#Una posible herramienta que usare mas tarde
-class MetricOperations:
-    def __init__(self):
-        pass
-
